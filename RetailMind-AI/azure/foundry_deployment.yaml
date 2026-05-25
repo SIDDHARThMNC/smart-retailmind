@@ -1,0 +1,44 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineEndpoint.schema.json
+
+name: retailmind-foundry-endpoint
+description: RetailMind AI — Smart Retail Analytics Backend
+location: eastus
+resource_group: retailmind-rg
+workspace_name: retailmind-foundry
+
+auth_mode: key
+
+traffic:
+  blue: 100
+
+deployments:
+  - name: blue
+    model: azureml:retailmind-demand-model:1
+    environment: azureml:retailmind-env:1
+    instance_type: Standard_DS2_v2
+    instance_count: 1
+    request_settings:
+      request_timeout_ms: 60000
+      max_concurrent_requests_per_instance: 10
+      max_queue_wait_ms: 5000
+    liveness_probe:
+      initial_delay: 30
+      period: 10
+      timeout: 5
+      failure_threshold: 3
+    readiness_probe:
+      initial_delay: 10
+      period: 5
+      timeout: 3
+      success_threshold: 1
+    environment_variables:
+      AZURE_KEYVAULT_URL:              "https://retailmind-kv.vault.azure.net/"
+      AZURE_OPENAI_DEPLOYMENT_NAME:    "gpt-4.1-mini"
+      AZURE_OPENAI_API_VERSION:        "2025-01-01-preview"
+      MONGODB_DB:                      "retailmind"
+      AZURE_LOCATION:                  "eastus"
+      AZURE_RESOURCE_GROUP:            "retailmind-rg"
+      AZURE_FOUNDRY_PROJECT_NAME:      "retailmind-foundry"
+
+identity:
+  type: system_assigned

@@ -1,0 +1,25 @@
+Inventory Management Policy
+
+RetailMind maintains a centralized inventory management system that tracks stock levels across all 10 store locations and the online warehouse. The system is updated in real time to ensure accurate stock information is available to both customers and store staff.
+
+Reorder levels are set for each product category based on historical sales data and seasonal demand patterns. When stock falls below the reorder level, an automatic purchase order is generated and sent to the supplier.
+
+Electronics products are maintained with a minimum stock of 20 units per store. Given the higher value and longer lead times, electronics are ordered in smaller quantities more frequently to reduce holding costs.
+
+Fashion and clothing items are managed on a seasonal basis. New collections are introduced at the beginning of each season, and end-of-season clearance sales are held to clear remaining stock. Unsold fashion items are not carried over to the next season.
+
+Grocery items are managed with strict first-in-first-out rotation to minimize wastage. Products approaching their expiry date are marked down for quick sale. Items that have expired are removed from shelves immediately and disposed of as per food safety regulations.
+
+Home and furniture items are stocked in limited quantities due to their size and storage requirements. Most furniture items are available for order and delivered within 7 to 14 business days.
+
+Beauty and personal care products are stored in temperature-controlled environments where required. Products with specific storage requirements are clearly labeled, and staff are trained to handle them appropriately.
+
+Stock audits are conducted monthly at each store location. Any discrepancies between the system records and physical stock are investigated and resolved within 48 hours.
+
+Damaged or defective stock is segregated from sellable inventory and returned to the supplier or disposed of as per the supplier agreement. Damaged goods are never sold to customers.
+
+Inter-store transfers are allowed when one store has excess stock and another has a shortage. Transfer requests are approved by the regional inventory manager and completed within 3 business days.
+
+The company uses demand forecasting models to predict future stock requirements. These forecasts are reviewed monthly and adjusted based on actual sales performance, upcoming promotions, and market trends.
+
+For inventory-related queries or to report a stock discrepancy, store managers can contact the inventory team through the internal management portal.
