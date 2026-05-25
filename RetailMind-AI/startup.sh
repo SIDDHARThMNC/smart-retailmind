@@ -1,34 +1,35 @@
 #!/bin/bash
-set -e
 
-echo "=== RetailMind AI Startup ==="
-echo "Python: $(python --version)"
-echo "Working dir: $(pwd)"
-echo "Contents: $(ls /home/site/wwwroot/)"
+echo ">>> Python: $(python --version)"
+echo ">>> PWD: $(pwd)"
+echo ">>> wwwroot contents:"
+ls /home/site/wwwroot/
 
-# Find the actual app directory
+# Detect app root
 if [ -d "/home/site/wwwroot/RetailMind-AI" ]; then
-    APP_DIR="/home/site/wwwroot/RetailMind-AI"
-    echo "Found app at: $APP_DIR"
-elif [ -f "/home/site/wwwroot/backend/main.py" ]; then
-    APP_DIR="/home/site/wwwroot"
-    echo "Found app at: $APP_DIR"
+    export APP_DIR="/home/site/wwwroot/RetailMind-AI"
 else
-    echo "ERROR: Cannot find app directory"
-    ls -la /home/site/wwwroot/
-    exit 1
+    export APP_DIR="/home/site/wwwroot"
 fi
 
+echo ">>> APP_DIR: $APP_DIR"
 cd $APP_DIR
-echo "Changed to: $(pwd)"
 
-# Install dependencies
-echo "=== Installing dependencies ==="
-pip install --quiet -r requirements.txt
+# Force install all dependencies into system python
+echo ">>> Installing dependencies..."
+pip install --upgrade pip --quiet
+pip install -r $APP_DIR/requirements.txt --quiet
 
-# Set Python path
+echo ">>> Verifying uvicorn..."
+python -c "import uvicorn; print('uvicorn OK:', uvicorn.__version__)"
+python -c "import gunicorn; print('gunicorn OK:', gunicorn.__version__)"
+
 export PYTHONPATH=$APP_DIR
 export APP_ROOT=$APP_DIR
 
-echo "=== Starting gunicorn ==="
-gunicorn -w 2 -k uvicorn.workers.UvicornWorker backend.main:app --bind 0.0.0.0:8000 --timeout 120 --access-logfile '-' --error-logfile '-'
+echo ">>> Starting app..."
+exec gunicorn -w 2 -k uvicorn.workers.UvicornWorker backend.main:app \
+    --bind 0.0.0.0:8000 \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile -
