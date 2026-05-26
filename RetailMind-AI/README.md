@@ -34,7 +34,7 @@ RetailMind-AI/
 │   │   ├── prediction.py        # Demand prediction using saved model
 │   │   └── anomaly.py           # IsolationForest anomaly detection
 │   ├── rag/
-│   │   └── rag_service.py       # ChromaDB + TF-IDF RAG pipeline
+│   │   └── rag_service.py       # TF-IDF RAG pipeline
 │   ├── routes/
 │   │   ├── ingestion.py         # POST /api/ingest
 │   │   ├── documents.py         # POST /api/search
@@ -62,7 +62,6 @@ RetailMind-AI/
 │       ├── discount_policy.txt
 │       ├── inventory_policy.txt
 │       └── product_policy.txt
-├── chroma_db/
 ├── pytest.ini
 ├── requirements.txt
 ├── startup.txt
@@ -206,9 +205,7 @@ The trained model and preprocessor are saved as `.pkl` files in `backend/saved_m
 
 ## RAG Pipeline
 
-Policy documents in `data/documents/` are chunked using LangChain's `RecursiveCharacterTextSplitter` and indexed in **ChromaDB** with 384-dimensional sentence-transformer embeddings. When a query comes in, the top 3 relevant chunks are retrieved and passed to Azure OpenAI for a grounded answer.
-
-If ChromaDB is unavailable, the system automatically falls back to TF-IDF based retrieval.
+Policy documents in `data/documents/` are chunked using LangChain's `RecursiveCharacterTextSplitter` and indexed with **TF-IDF** (scikit-learn). When a query comes in, the top 3 relevant chunks are retrieved by cosine similarity and passed to Azure OpenAI for a grounded answer.
 
 ---
 
@@ -266,6 +263,5 @@ The test suite has 22 tests covering agent routing logic, API response codes and
 
 ## Notes
 
-- The first request after startup may be slightly slower as ChromaDB builds the vector index from the policy documents
 - If Azure OpenAI credentials are not set, the API still works — it just returns the raw data without GPT-enhanced insights
 - The model needs to be trained at least once via `POST /api/train` before predictions will work

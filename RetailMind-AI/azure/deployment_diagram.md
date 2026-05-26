@@ -23,7 +23,7 @@
 │   │  gpt-4.1-mini         │◀──────────────────────────────────────────────┐    │
 │   │  (Agent Chat + RAG)   │                                               │    │
 │   │                       │                                               │    │
-│   │  text-embedding-      │◀── ChromaDB RAG Pipeline                     │    │
+│   │  text-embedding-      │◀── TF-IDF RAG Pipeline                       │    │
 │   │  ada-002 (future)     │                                               │    │
 │   └──────────────────────┘                                               │    │
 └───────────────────────────────────────────────────────────────────────────┼────┘
@@ -50,19 +50,19 @@
                                          │
               ┌──────────────────────────┼──────────────────────────┐
               │                          │                          │
-              ▼                          ▼                          ▼
-┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
-│   Azure Key Vault   │   │   MongoDB Atlas      │   │   ChromaDB          │
-│   (retailmind-kv)   │   │   (RetailMindDB)      │   │   (local volume)    │
-│  ─────────────────  │   │  ─────────────────── │   │  ─────────────────  │
-│  azure-openai-      │   │  retailmind DB        │   │  retail_knowledge_  │
-│    api-key          │   │  sales collection     │   │  base collection    │
-│  mongodb-uri        │   │  (product, date,      │   │  (384-dim semantic  │
-│  azure-openai-      │   │   revenue, region,    │   │   embeddings)       │
-│    endpoint         │   │   store, category)    │   │                     │
-│  foundry-           │   └─────────────────────┘   │  TF-IDF fallback    │
-│    connection-str   │                              │  if unavailable     │
-└─────────────────────┘                              └─────────────────────┘
+              ▼                          ▼
+┌─────────────────────┐   ┌─────────────────────┐
+│   Azure Key Vault   │   │   MongoDB Atlas      │
+│   (retailmind-kv)   │   │   (RetailMindDB)      │
+│  ─────────────────  │   │  ─────────────────── │
+│  azure-openai-      │   │  retailmind DB        │
+│    api-key          │   │  sales collection     │
+│  mongodb-uri        │   │  (product, date,      │
+│  azure-openai-      │   │   revenue, region,    │
+│    endpoint         │   │   store, category)    │
+│  foundry-           │   └─────────────────────┘
+│    connection-str   │
+└─────────────────────┘
          │
          │  RBAC: "Key Vault Secrets User"
          │  (granted to App Service Managed Identity)
@@ -100,7 +100,7 @@
        │         │         │                │
        │         │         │                ▼
        │         │         │         rag_service.py
-       │         │         │         (ChromaDB semantic search)
+       │         │         │         (TF-IDF document search)
        │         │         │
        │         │         └──▶ azure_openai.py
        │         │                   │
@@ -183,7 +183,7 @@
 | **Azure Key Vault** | Secret management (API keys, DB URI) | ✅ Configured |
 | **Azure Managed Identity** | Passwordless Key Vault access | ✅ Configured |
 | **MongoDB Atlas** | Sales data persistence | ✅ Active |
-| **ChromaDB** | RAG vector store (semantic search) | ✅ Active |
+| **TF-IDF RAG** | Document search (in-process, no external dependency) | ✅ Active |
 
 ---
 
