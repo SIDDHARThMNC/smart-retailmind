@@ -67,6 +67,12 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+@app.get("/")
+async def root():
+    return {
+        "message": "RetailMind AI API running successfully"
+    }
+
 
 @app.get("/health")
 def health():
