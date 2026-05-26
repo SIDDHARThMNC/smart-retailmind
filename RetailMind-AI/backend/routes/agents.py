@@ -43,6 +43,12 @@ async def dashboard():
         raise HTTPException(status_code=404, detail="No data available. Upload via POST /api/ingest.")
 
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+    required_cols = {"revenue", "units_sold", "product_name", "category", "region"}
+    missing_cols = required_cols - set(df.columns)
+    if missing_cols:
+        raise HTTPException(status_code=422, detail=f"Dataset missing required columns: {sorted(missing_cols)}")
+
     monthly = df.groupby(df["date"].dt.to_period("M"))["revenue"].sum().reset_index()
     monthly["date"] = monthly["date"].astype(str)
 

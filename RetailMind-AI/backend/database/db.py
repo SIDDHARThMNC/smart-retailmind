@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
-from pymongo import MongoClient, ASCENDING
-from pymongo.errors import ConnectionFailure
+from pymongo import MongoClient, ASCENDING, ReplaceOne
+from pymongo.errors import ConnectionFailure, BulkWriteError
 from backend.config import settings
 
 logger = logging.getLogger(__name__)
@@ -28,17 +28,17 @@ def init_db():
     try:
         db = get_db()
         db["sales"].create_index([("product_id", ASCENDING), ("date", ASCENDING)])
-        logger.info(f"MongoDB connected: {settings.MONGODB_URI} | DB: {settings.MONGODB_DB}")
+        logger.info(f"MongoDB connected: DB={settings.MONGODB_DB}")
     except ConnectionFailure as e:
         logger.warning(f"MongoDB connection warning: {e}")
 
 
 def insert_sales_data(df: pd.DataFrame):
     col = get_db()["sales"]
-    records = []
+    operations = []
     for row in df.to_dict(orient="records"):
         try:
-            records.append({
+            doc = {
                 "date": str(pd.to_datetime(row["date"]).date()),
                 "product_id": str(row["product_id"]),
                 "product_name": str(row.get("product_name", "")),
@@ -49,11 +49,22 @@ def insert_sales_data(df: pd.DataFrame):
                 "revenue": float(row.get("revenue", 0)),
                 "store_id": str(row.get("store_id", "")),
                 "region": str(row.get("region", "")),
-            })
+            }
+            operations.append(
+                ReplaceOne(
+                    {"product_id": doc["product_id"], "date": doc["date"], "store_id": doc["store_id"]},
+                    doc,
+                    upsert=True,
+                )
+            )
         except Exception as e:
             logger.warning(f"Skipping row: {e}")
 
-    if records:
-        col.delete_many({})
-        col.insert_many(records)
-        logger.info(f"Inserted {len(records)} records into MongoDB.")
+    if operations:
+        try:
+            result = col.bulk_write(operations, ordered=False)
+            logger.info(
+                f"Upserted {result.upserted_count} new, modified {result.modified_count} existing records."
+            )
+        except BulkWriteError as bwe:
+            logger.warning(f"Bulk write partial error: {bwe.details}")

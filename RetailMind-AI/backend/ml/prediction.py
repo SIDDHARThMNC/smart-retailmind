@@ -13,6 +13,8 @@ PREPROCESSOR_PATH = os.path.join(_APP_ROOT, "backend", "saved_models", "preproce
 def predict_demand(product_id, date_str, price, discount, store_id, region):
     if not os.path.exists(MODEL_PATH):
         raise FileNotFoundError("Model not found. Run POST /train first.")
+    if not os.path.exists(PREPROCESSOR_PATH):
+        raise FileNotFoundError("Preprocessor not found. Run POST /train first.")
 
     model = joblib.load(MODEL_PATH)
     preprocessor = joblib.load(PREPROCESSOR_PATH)
@@ -58,6 +60,9 @@ def predict_demand(product_id, date_str, price, discount, store_id, region):
     }
 
     input_df = pd.DataFrame([row])[[c for c in feature_cols if c in row]]
+    missing_features = [c for c in feature_cols if c not in row]
+    if missing_features:
+        logger.warning(f"Missing features (using defaults): {missing_features}")
     predicted = max(0, int(round(model.predict(input_df)[0])))
 
     logger.info(f"Prediction for {product_id}: {predicted} units")

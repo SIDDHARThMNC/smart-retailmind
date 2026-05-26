@@ -2,7 +2,7 @@ import io
 import os
 import logging
 import pandas as pd
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 
 from backend.ml.preprocessing import validate_columns, clean_data
 from backend.database.db import insert_sales_data
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 _APP_ROOT = os.environ.get("APP_ROOT", os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 DATA_PATH = os.path.join(_APP_ROOT, "data", "cleaned_retail_sales.csv")
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
 
 
 @router.post("/api/ingest")
@@ -20,8 +21,15 @@ async def ingest_data(file: UploadFile = File(...)):
     if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are accepted.")
 
+    raw_bytes = await file.read()
+    if len(raw_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large. Maximum allowed size is {MAX_UPLOAD_BYTES // (1024*1024)} MB.",
+        )
+
     try:
-        df_raw = pd.read_csv(io.BytesIO(await file.read()))
+        df_raw = pd.read_csv(io.BytesIO(raw_bytes))
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Could not read CSV: {e}")
 

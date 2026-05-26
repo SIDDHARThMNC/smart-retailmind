@@ -1,3 +1,4 @@
+import os
 import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -10,6 +11,9 @@ from backend.config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+_APP_ROOT = os.environ.get("APP_ROOT", os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+_ALLOWED_DATA_PATH = os.path.join(_APP_ROOT, "data", "cleaned_retail_sales.csv")
 
 
 def _gpt(system: str, user_msg: str, max_tokens: int = 200):
@@ -32,8 +36,20 @@ class TrainRequest(BaseModel):
 @router.post("/api/train")
 async def train(req: TrainRequest):
     try:
+        # Restrict data_path to the known safe location — prevents path traversal
+        safe_path = _ALLOWED_DATA_PATH if req.data_path is None else None
+        if req.data_path is not None:
+            requested = os.path.realpath(req.data_path)
+            allowed = os.path.realpath(_ALLOWED_DATA_PATH)
+            if requested != allowed:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Custom data_path is not permitted. Use POST /api/ingest to upload data first.",
+                )
+            safe_path = req.data_path
+
         result = train_models(
-            data_path=req.data_path,
+            data_path=safe_path,
             test_size=req.test_size,
             n_estimators=req.n_estimators,
             random_state=req.random_state,
