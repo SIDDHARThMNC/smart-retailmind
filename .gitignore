@@ -1,0 +1,12 @@
+# Test output files
+test_results.txt
+pytest_out.txt
+pytest_results.txt
+full_test_out.txt
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
