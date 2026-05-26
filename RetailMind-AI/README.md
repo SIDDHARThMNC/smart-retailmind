@@ -64,7 +64,7 @@ RetailMind-AI/
 │       └── product_policy.txt
 ├── pytest.ini
 ├── requirements.txt
-├── startup.txt
+├── startup.sh
 └── README.md
 ```
 

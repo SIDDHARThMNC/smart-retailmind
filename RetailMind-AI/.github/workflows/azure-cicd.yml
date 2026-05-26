@@ -47,8 +47,8 @@ jobs:
 
       # ── 5. Build deployment package ───────────────────────────────────────
       # Package the RetailMind-AI subfolder so that requirements.txt,
-      # startup.txt, backend/, and data/ are all at the package root.
-      # Azure Web App will see requirements.txt at / and startup.txt at /.
+      # startup.sh, backend/, and data/ are all at the package root.
+      # Azure Web App will see requirements.txt at / and startup.sh at /.
       - name: Build deployment zip
         run: |
           cd RetailMind-AI
