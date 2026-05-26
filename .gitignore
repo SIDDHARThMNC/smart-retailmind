@@ -18,7 +18,7 @@ env/
 backend/.env
 
 # Model files — too large for GitHub (265 MB). Auto-trained on first startup via lifespan.
-backend/saved_models/*.pkl
+
 
 # ChromaDB vector store (auto-generated on startup)
 chroma_db/
