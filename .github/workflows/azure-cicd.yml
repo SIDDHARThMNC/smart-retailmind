@@ -46,26 +46,12 @@ jobs:
           cd RetailMind-AI
           python -m pytest backend/tests/ -v --tb=short --no-header
 
-      # ── 5. Build deployment package ───────────────────────────────────────
-      # Package the RetailMind-AI subfolder so that requirements.txt,
-      # startup.sh, backend/, and data/ are all at the package root.
-      # Azure Web App will see requirements.txt at / and startup.sh at /.
-      - name: Build deployment zip
-        run: |
-          cd RetailMind-AI
-          zip -r ../deploy.zip . \
-            -x "*.pyc" \
-            -x "*__pycache__*" \
-            -x "*.pytest_cache*" \
-            -x ".venv/*" \
-            -x "screenshots/*" \
-            -x "backend/tests/*" \
-            -x "*.log"
-
-      # ── 6. Deploy to Azure Web App ────────────────────────────────────────
+      # ── 5. Deploy to Azure Web App ────────────────────────────────────────
+      # Deploy ONLY the RetailMind-AI folder so Azure sees requirements.txt
+      # and startup.sh at the app root, not repository root.
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: retailmind-ai-sid
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: deploy.zip
+          package: ./RetailMind-AI
