@@ -57,7 +57,6 @@ jobs:
             -x "*__pycache__*" \
             -x "*.pytest_cache*" \
             -x ".venv/*" \
-            -x "chroma_db/*" \
             -x "screenshots/*" \
             -x "backend/tests/*" \
             -x "*.log"
