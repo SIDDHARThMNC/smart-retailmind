@@ -33,9 +33,11 @@ deployments:
       success_threshold: 1
     environment_variables:
       AZURE_KEYVAULT_URL:              "https://retailmind-kv.vault.azure.net/"
+      AZURE_OPENAI_ENDPOINT:           "https://retailmind-openai.openai.azure.com/"
       AZURE_OPENAI_DEPLOYMENT_NAME:    "gpt-4.1-mini"
       AZURE_OPENAI_API_VERSION:        "2025-01-01-preview"
       MONGODB_DB:                      "retailmind"
+      MONGODB_URI:                     "mongodb+srv://placeholder"
       AZURE_LOCATION:                  "eastus"
       AZURE_RESOURCE_GROUP:            "retailmind-rg"
       AZURE_FOUNDRY_PROJECT_NAME:      "retailmind-foundry"
